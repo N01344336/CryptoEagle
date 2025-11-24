@@ -1,0 +1,24 @@
+{
+  "name": "cryptoeagle",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/N01344336/CryptoEagle.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/N01344336/CryptoEagle/issues"
+  },
+  "homepage": "https://github.com/N01344336/CryptoEagle#readme",
+  "dependencies": {
+    "dotenv": "^17.2.3",
+    "express": "^5.1.0"
+  },
+  "description": ""
+}
