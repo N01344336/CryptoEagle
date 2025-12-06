@@ -22,6 +22,12 @@ const getAllCrypto = async (queryParams = {}) => {
             ];
         }
 
+        if (minPrice || maxPrice) {
+            query.current_price = {};
+            if (minPrice) query.current_price.$gte = parseFloat(minPrice);
+            if (maxPrice) query.current_price.$lte = parseFloat(maxPrice);
+        }
+
         if (category) {
             query.category = category;
         }
@@ -34,7 +40,7 @@ const getAllCrypto = async (queryParams = {}) => {
         const cryptos = await Crypto.find(query)
             .sort(sort)
             .skip(skip)
-            .limit(parse(limit));
+            .limit(parseInt(limit));
 
         const total = await Crypto.countDocuments(query);
         const totalPages = Math.ceil(total / limit);
@@ -70,6 +76,15 @@ const getCrypto = async (id) => {
     }
 };
 
+const getCryptoBySymbol = async (symbol) => {
+    try {
+        const crypto = await Crypto.findOne({ symbol: symbol.toUpperCase() });
+        return crypto;
+    } catch (err) {
+        throw new Error(`Error fetching cryptocurrency by symbol: ${err.message}`);
+    }
+};
+
 const addCrypto = async (cryptoData) => {
     try {
         const newCrypto = new Crypto(cryptoData);
@@ -77,15 +92,16 @@ const addCrypto = async (cryptoData) => {
 
         return newCrypto;
     } catch (err) {
-        throw new Error(`Error creating cryptocurrency: ${error.message}`);
+        throw new Error(`Error creating cryptocurrency: ${err.message}`);
     }
 };
 
 const updateCrypto = async (id, updateData) => {
     try {
+        delete updateData.symbol;
         const updateCrypto = await Crypto.findByIdAndUpdate(
             id,
-            { ...updateData, last_updated: new Date() },
+            { ...updateData, },
             { new: true, runValidators: true }
         );
 
@@ -95,7 +111,7 @@ const updateCrypto = async (id, updateData) => {
 
         return updateCrypto;
     } catch (err) {
-        throw new Error(`Error updating cryptocurrency: ${error.message}`);
+        throw new Error(`Error updating cryptocurrency: ${err.message}`);
     }
 };
 
@@ -103,15 +119,15 @@ const deleteCrypto = async (id) => {
     try {
         const deleteCrypto = await Crypto.findByIdAndDelete(id);
 
-        if (!deletedCrypto) {
+        if (!deleteCrypto) {
             throw new Error('Cryptocurrency not found');
         }
 
-        return deletedCrypto;
+        return deleteCrypto;
     } catch (err) {
-        throw new Error(`Error deleting cryptocurrency: ${error.message}`);
+        throw new Error(`Error deleting cryptocurrency: ${err.message}`);
     }
-}
+};
 
 const getStates = async () => {
     try {
@@ -130,13 +146,14 @@ const getStates = async () => {
 
         return stats[0] || {};
     } catch (err) {
-        throw new Error(`Error getting statistics: ${error.message}`);
+        throw new Error(`Error getting statistics: ${err.message}`);
     }
 };
 
 module.exports = {
     getAllCrypto,
     getCrypto,
+    getCryptoBySymbol,
     addCrypto,
     updateCrypto,
     deleteCrypto,
